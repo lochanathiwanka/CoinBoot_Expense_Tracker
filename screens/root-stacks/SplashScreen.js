@@ -15,7 +15,7 @@ const SplashScreen = ({navigation}) => {
                     duration={2500}
                     style={style.logo}
                     resizeMode='contain'
-                    source={require('../assets/logo.png')}/>
+                    source={require('../../assets/logo.png')}/>
             </View>
             <Animatable.View
                 animation="fadeInUpBig"
