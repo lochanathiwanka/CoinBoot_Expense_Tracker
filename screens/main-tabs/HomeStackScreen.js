@@ -1,9 +1,11 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {StatusBar, Text, View, StyleSheet, Dimensions, Image, TouchableOpacity} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {PieChart} from 'react-native-chart-kit';
 import * as Animatable from 'react-native-animatable';
+import {useIsFocused} from '@react-navigation/native'
+import FocusAwareStatusBar from '../FocusAwareStatusBar';
 
 //pie chart data
 const data = [
@@ -44,9 +46,10 @@ const chartConfig = {
 };
 
 const HomeScreen = () => {
+
     return (
         <View style={style.container}>
-            <StatusBar backgroundColor='#E3E7F1' barStyle="dark-content"/>
+            <FocusAwareStatusBar backgroundColor='#E3E7F1' barStyle="dark-content"/>
             <Animatable.View style={style.headerContainer} animation='bounceIn' duration={1500}>
                 <Image style={style.userImage} source={require('../../assets/user_1.png')}/>
                 <Text style={style.fullName}>Lochana Thiwanka</Text>
@@ -78,7 +81,7 @@ const HomeScreen = () => {
                 </View>
             </Animatable.View>
             <Animatable.View style={style.footerContainer} animation='fadeInUpBig'>
-                <Text style={{fontSize: 30, fontWeight: 'bold', color: '#414754', left: 20}}>Overview</Text>
+                <Text style={{fontSize: 30, fontWeight: 'bold', color: '#414754', left: 20, top: 20}}>Overview</Text>
                 <PieChart
                     data={data}
                     width={screenWidth}
@@ -88,6 +91,7 @@ const HomeScreen = () => {
                     backgroundColor={"transparent"}
                     paddingLeft={"15"}
                     absolute
+                    style={{top: 50}}
                 />
             </Animatable.View>
         </View>
@@ -218,6 +222,7 @@ const style = StyleSheet.create({
         width: width,
         height: 400,
     },
+
 });
 
 const HomeStack = createStackNavigator();

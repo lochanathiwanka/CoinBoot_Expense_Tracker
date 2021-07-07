@@ -31,9 +31,7 @@ const SignUpScreen = ({navigation}) => {
     }
 
     return (
-        <KeyboardAwareScrollView
-            behavior={Platform.OS === "ios" ? "padding" : null}
-        >
+        <KeyboardAwareScrollView behavior={Platform.OS === "ios" ? "padding" : null}>
             <ScrollView>
                 <Animatable.View style={style.container} animation='fadeInUpBig'>
                     <View style={style.headerContainer}>
