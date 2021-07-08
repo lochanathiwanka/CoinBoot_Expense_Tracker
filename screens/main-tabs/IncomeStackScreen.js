@@ -32,7 +32,13 @@ const IncomeScreen = () => {
     const [isSalaryClicked, setSalaryClicked] = React.useState(false);
     const [isInterestClicked, setInterestClicked] = React.useState(false);
     const [isOtherClicked, setOtherClicked] = React.useState(false);
-    let selected_category = 'salary';
+    let selected_category = '';
+
+    const [isIncomeDetailViewClicked, setIncomeDetailViewClicked] = React.useState({
+        salaryDetailView: false,
+        interestDetailView: false,
+        otherDetailView: false,
+    });
 
     //component is focused
     const isFocused = useIsFocused();
@@ -69,9 +75,9 @@ const IncomeScreen = () => {
             })
             .catch((error) => {
                 let obj = {
-                    salary: 0 ,
+                    salary: 0,
                     interest: 0,
-                    other: 0
+                    other: 0,
                 };
                 setIncomeDetails(obj);
             });
@@ -88,73 +94,146 @@ const IncomeScreen = () => {
             isTyped: false,
         });
         selected_category = 'salary';
+        setIncomeDetailViewClicked({
+            salaryDetailView: false,
+            interestDetailView: false,
+            otherDetailView: false,
+        });
     }, [isFocused]);
 
     const onSalaryClick = () => {
         setSalaryClicked(true);
         setInterestClicked(false);
         setOtherClicked(false);
+        setIncomeDetailViewClicked({
+            ...isIncomeDetailViewClicked,
+            salaryDetailView: false,
+            interestDetailView: false,
+            otherDetailView: false,
+        });
     };
 
     const onInterestClick = () => {
         setSalaryClicked(false);
         setInterestClicked(true);
         setOtherClicked(false);
+        setIncomeDetailViewClicked({
+            ...isIncomeDetailViewClicked,
+            salaryDetailView: false,
+            interestDetailView: false,
+            otherDetailView: false,
+        });
     };
 
     const onOtherClick = () => {
         setSalaryClicked(false);
         setInterestClicked(false);
         setOtherClicked(true);
+        setIncomeDetailViewClicked({
+            ...isIncomeDetailViewClicked,
+            salaryDetailView: false,
+            interestDetailView: false,
+            otherDetailView: false,
+        });
     };
 
     const onSaveClick = () => {
-        //check if one of category is selected
-        if (isSalaryClicked || isInterestClicked || isOtherClicked) {
-            //check if input field is not empty
-            if (income.value.length > 0 && income.value.length !== 'undefined') {
-                if (isSalaryClicked) {
-                    selected_category = 'salary';
-                } else if (isInterestClicked) {
-                    selected_category = 'interest';
-                } else if (isOtherClicked) {
-                    selected_category = 'other';
-                }
+        //check if one of detail view is selected
+        if (isIncomeDetailViewClicked.salaryDetailView || isIncomeDetailViewClicked.interestDetailView || isIncomeDetailViewClicked.otherDetailView) {
 
-                //get details
-                let obj = {
-                    user_name: userName,
-                    year: year,
-                    month: month,
-                    details: [
-                        {
-                            user: [
-                                {
-                                    user_name: userName,
-                                    details: [
-                                        {
-                                            year: year,
-                                            month: month,
-                                            salary: isSalaryClicked ? parseInt(income.value) : 0,
-                                            interest: isInterestClicked ? parseInt(income.value) : 0,
-                                            other: isOtherClicked ? parseInt(income.value) : 0,
-                                        },
-                                    ],
-                                },
-                            ],
+            let source;
+            if (isIncomeDetailViewClicked.salaryDetailView) {
+                source = 'salary'
+            } else if (isIncomeDetailViewClicked.interestDetailView) {
+                source = 'interest'
+            } else if (isIncomeDetailViewClicked.otherDetailView) {
+                source = 'other'
+            }
+
+            let obj = {
+                user_name: userName,
+                year: year,
+                month: month,
+                source: source,
+                salary: income.value,
+                interest: income.value,
+                other: income.value
+            }
+
+            //save income details
+            fetch('https://coin-boot.herokuapp.com/api/user/income/', {
+                method: 'PUT',
+                headers: {
+                    Accept: 'application/json',
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(obj),
+            }).then((response) => {
+                alert('Data updated!');
+                getIncomeDetails(userName);
+                setIncomeDetailViewClicked({
+                    ...isIncomeDetailViewClicked,
+                    salaryDetailView: false,
+                    interestDetailView: false,
+                    otherDetailView: false,
+                });
+                setIncome({
+                    ...income,
+                    value: '',
+                    isTyped: false,
+                });
+                selected_category = 'salary';
+            })
+                .catch((error) => console.log(error));
+
+        }
+        else {
+            //check if one of category is selected
+            if (isSalaryClicked || isInterestClicked || isOtherClicked) {
+                //check if input field is not empty
+                if (income.value.length > 0 && income.value.length !== 'undefined') {
+                    if (isSalaryClicked) {
+                        selected_category = 'salary';
+                    } else if (isInterestClicked) {
+                        selected_category = 'interest';
+                    } else if (isOtherClicked) {
+                        selected_category = 'other';
+                    }
+
+                    //get details
+                    let obj = {
+                        user_name: userName,
+                        year: year,
+                        month: month,
+                        details: [
+                            {
+                                user: [
+                                    {
+                                        user_name: userName,
+                                        details: [
+                                            {
+                                                year: year,
+                                                month: month,
+                                                salary: isSalaryClicked ? parseInt(income.value) : 0,
+                                                interest: isInterestClicked ? parseInt(income.value) : 0,
+                                                other: isOtherClicked ? parseInt(income.value) : 0,
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        ],
+                    };
+
+                    //save income details
+                    fetch('https://coin-boot.herokuapp.com/api/user/income/', {
+                        method: 'POST',
+                        headers: {
+                            Accept: 'application/json',
+                            'Content-Type': 'application/json',
                         },
-                    ],
-                };
-
-                //save income details
-                fetch('https://coin-boot.herokuapp.com/api/user/income/', {
-                    method: 'POST',
-                    headers: {
-                        Accept: 'application/json',
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(obj),
-                }).then((response) => {
+                        body: JSON.stringify(obj),
+                    }).then((response) => {
                         alert('Data saved!');
                         getIncomeDetails(userName);
                         setSalaryClicked(false);
@@ -167,14 +246,16 @@ const IncomeScreen = () => {
                         });
                         selected_category = 'salary';
                     })
-                    .catch((error) => console.log(error));
+                        .catch((error) => console.log(error));
 
+                } else {
+                    alert('Income value is empty');
+                }
             } else {
-                alert('Income value is empty');
+                alert('Select a category');
             }
-        } else {
-            alert('Select a category');
         }
+
     };
 
     const incomeOnTyping = (text) => {
@@ -186,16 +267,64 @@ const IncomeScreen = () => {
     };
 
     const onSalaryViewClick = () => {
-        alert('hello');
-    }
+        setIncome({
+            ...income,
+            value: incomeDetails.salary + '',
+        });
+        setIncomeDetailViewClicked({
+            ...isIncomeDetailViewClicked,
+            salaryDetailView: true,
+            interestDetailView: false,
+            otherDetailView: false,
+        });
+        setSalaryClicked(false);
+        setInterestClicked(false);
+        setOtherClicked(false);
+    };
 
+    const onInterestViewClick = () => {
+        setIncome({
+            ...income,
+            value: incomeDetails.interest + '',
+        });
+        setIncomeDetailViewClicked({
+            ...isIncomeDetailViewClicked,
+            salaryDetailView: false,
+            interestDetailView: true,
+            otherDetailView: false,
+        });
+        setSalaryClicked(false);
+        setInterestClicked(false);
+        setOtherClicked(false);
+    };
+
+    const onOtherViewClick = () => {
+        setIncome({
+            ...income,
+            value: incomeDetails.other + '',
+        });
+        setIncomeDetailViewClicked({
+            ...isIncomeDetailViewClicked,
+            salaryDetailView: false,
+            interestDetailView: false,
+            otherDetailView: true,
+        });
+        setSalaryClicked(false);
+        setInterestClicked(false);
+        setOtherClicked(false);
+    };
 
 
     // each value represents a goal ring in Progress chart
-    let totalIncome = incomeDetails.salary + incomeDetails.interest + incomeDetails.other
+    let totalIncome = incomeDetails.salary + incomeDetails.interest + incomeDetails.other;
+
+    let salaryPercentage = (incomeDetails.salary / totalIncome) ? (incomeDetails.salary / totalIncome) : 0;
+    let interestPercentage = (incomeDetails.interest / totalIncome) ? (incomeDetails.interest / totalIncome) : 0;
+    let otherPercentage = (incomeDetails.other / totalIncome) ? (incomeDetails.other / totalIncome) : 0;
+
     const data = {
         labels: ['Other', 'Interest', 'Salary'], // optional
-        data: [(incomeDetails.other / totalIncome), (incomeDetails.interest/ totalIncome), (incomeDetails.salary / totalIncome)],
+        data: [otherPercentage, interestPercentage, salaryPercentage],
         colors: ['#BB4440', '#D4B630', '#63A15F'],
     };
 
@@ -278,8 +407,9 @@ const IncomeScreen = () => {
                             />
                         </Animatable.View>
                         <View style={{flex: 0.1, borderBottomColor: '#B1B1B1', borderBottomWidth: 1}}/>
-                        <Animatable.View animation='pulse' duration={1500} style={style.monthlyIncomeDetailViewContainer}>
-                            <TouchableOpacity style={style.salaryDetailView}  >
+                        <Animatable.View animation='pulse' duration={1500}
+                                         style={style.monthlyIncomeDetailViewContainer}>
+                            <TouchableOpacity style={style.salaryDetailView} onPress={onSalaryViewClick}>
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -297,7 +427,7 @@ const IncomeScreen = () => {
                                     borderBottomRightRadius: 15,
                                 }}/>
                             </TouchableOpacity>
-                            <TouchableOpacity style={style.interestDetailView} >
+                            <TouchableOpacity style={style.interestDetailView} onPress={onInterestViewClick}>
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -315,7 +445,7 @@ const IncomeScreen = () => {
                                     borderBottomRightRadius: 15,
                                 }}/>
                             </TouchableOpacity>
-                            <TouchableOpacity style={style.otherDetailView} >
+                            <TouchableOpacity style={style.otherDetailView} onPress={onOtherViewClick}>
                                 <View style={{
                                     height: '100%',
                                     width: 40,
