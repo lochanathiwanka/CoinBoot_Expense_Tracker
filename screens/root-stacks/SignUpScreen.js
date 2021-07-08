@@ -16,10 +16,16 @@ import AntDesign from 'react-native-vector-icons/AntDesign';
 import * as Animatable from 'react-native-animatable'
 import Feather from 'react-native-vector-icons/Feather';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import {AuthContext} from '../../components/context';
 
 const SignUpScreen = ({navigation}) => {
 
     const [data, setData] = React.useState({
+        name: '',
+        address: '',
+        contact: '',
+        userName: '',
+        password: '',
         showPassword: false
     });
 
@@ -27,6 +33,43 @@ const SignUpScreen = ({navigation}) => {
         setData({
             ...data,
             showPassword: !data.showPassword
+        });
+    }
+
+    const {signUp} = React.useContext(AuthContext);
+
+    const nameOnChange = (val) => {
+        setData({
+            ...data,
+            name: val
+        });
+    }
+
+    const addressOnChange = (val) => {
+        setData({
+            ...data,
+            address: val
+        });
+    }
+
+    const contactOnChange = (val) => {
+        setData({
+            ...data,
+            contact: val
+        });
+    }
+
+    const userNameOnChange = (val) => {
+        setData({
+            ...data,
+            userName: val
+        });
+    }
+
+    const passwordOnChange = (val) => {
+        setData({
+            ...data,
+            password: val
         });
     }
 
@@ -49,89 +92,36 @@ const SignUpScreen = ({navigation}) => {
                     </View>
                     <View style={style.nameContainer}>
                         <Text style={style.formLabel}>Name</Text>
-                        <AntDesign
-                            name='leftcircleo'
-                            color="black"
-                            size={20}
-                            style={style.formIcon}
-                        />
-                        <TextInput
-                            placeholder='User'
-                            style={style.formInput}
-                        />
+                        <AntDesign name='leftcircleo' color="black" size={20} style={style.formIcon}/>
+                        <TextInput placeholder='User' style={style.formInput} onChangeText={(val) => nameOnChange(val)}/>
                     </View>
                     <View style={style.addressContainer}>
                         <Text style={style.formLabel}>Address</Text>
-                        <AntDesign
-                            name='leftcircleo'
-                            color="black"
-                            size={20}
-                            style={style.formIcon}
-                        />
-                        <TextInput
-                            placeholder='Sri Lanka, Panadura'
-                            style={style.formInput}
-                        />
+                        <AntDesign name='leftcircleo' color="black" size={20} style={style.formIcon}/>
+                        <TextInput placeholder='Sri Lanka, Panadura' style={style.formInput} onChangeText={(val) => addressOnChange(val)}/>
                     </View>
                     <View style={style.contactContainer}>
                         <Text style={style.formLabel}>Contact</Text>
-                        <AntDesign
-                            name='leftcircleo'
-                            color="black"
-                            size={20}
-                            style={style.formIcon}
-                        />
-                        <TextInput
-                            placeholder='+94111111111'
-                            style={style.formInput}
-                        />
+                        <AntDesign name='leftcircleo' color="black" size={20} style={style.formIcon}/>
+                        <TextInput placeholder='+94111111111' style={style.formInput} onChangeText={(val) => contactOnChange(val)}/>
                     </View>
                     <View style={style.userNameContainer}>
                         <Text style={style.formLabel}>User Name</Text>
-                        <AntDesign
-                            name='leftcircleo'
-                            color="black"
-                            size={20}
-                            style={style.formIcon}
-                        />
-                        <TextInput
-                            placeholder='user123@gmail.com'
-                            style={style.formInput}
-                        />
+                        <AntDesign name='leftcircleo' color="black" size={20} style={style.formIcon}/>
+                        <TextInput placeholder='user123@gmail.com' style={style.formInput} onChangeText={(val) => userNameOnChange(val)}/>
                     </View>
                     <View style={style.passwordContainer}>
                         <Text style={style.formLabel}>Password</Text>
-                        <FontAwesome
-                            name='lock'
-                            color="black"
-                            size={20}
-                            style={style.formIcon}
-                        />
-                        <TextInput
-                            placeholder='********'
-                            style={style.formInput}
-                            autoCapitalize='none'
-                            secureTextEntry={!data.showPassword}
-                        />
-                        <TouchableOpacity
-                            style={{position:'absolute', top:'50%', right: 30}}
-                            onPress={showPassword}
-                        >
+                        <FontAwesome name='lock' color="black" size={20} style={style.formIcon}/>
+                        <TextInput placeholder='********' style={style.formInput} autoCapitalize='none' secureTextEntry={!data.showPassword} onChangeText={(val) => passwordOnChange(val)}/>
+                        <TouchableOpacity style={{position:'absolute', top:'50%', right: 30}} onPress={showPassword}>
                             {data.showPassword?
-                                <Feather
-                                    name='eye'
-                                    color='gray'
-                                    size={18}
-                                /> :
-                                <Feather
-                                    name='eye-off'
-                                    color='gray'
-                                    size={18}
-                                />
+                                <Feather name='eye' color='gray' size={18}/> :
+                                <Feather name='eye-off' color='gray' size={18}/>
                             }
                         </TouchableOpacity>
                     </View>
-                    <TouchableOpacity style={style.signUpButtonContainer}>
+                    <TouchableOpacity style={style.signUpButtonContainer} onPress={() => signUp(data)}>
                         <LinearGradient colors={['#4C7D60', '#4C7D60']} style={style.signUpButton}>
                             <Text style={style.signUpText}>Sign Up</Text>
                         </LinearGradient>

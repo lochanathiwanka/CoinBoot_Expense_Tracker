@@ -9,19 +9,73 @@ import {useIsFocused} from '@react-navigation/native';
 import ProgressChart from 'react-native-chart-kit/dist/ProgressChart';
 import FocusAwareStatusBar from '../FocusAwareStatusBar';
 import * as Animatable from 'react-native-animatable';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const IncomeScreen = () => {
 
+    let today = new Date();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+    let month = monthNames[today.getMonth()];
+    let year = today.getFullYear().toString();
+
+    //income text field
     const [income, setIncome] = React.useState({
         value: '',
         isTyped: false,
     });
+
+    //income details
+    const [incomeDetails, setIncomeDetails] = React.useState({});
+
     const [isSalaryClicked, setSalaryClicked] = React.useState(false);
     const [isInterestClicked, setInterestClicked] = React.useState(false);
     const [isOtherClicked, setOtherClicked] = React.useState(false);
+    let selected_category = 'salary';
 
     //component is focused
     const isFocused = useIsFocused();
+
+    const [userName, setUserName] = React.useState('');
+
+    useEffect(() => {
+        let name = '';
+        //get userName from Async Storage
+        const getData = async () => {
+            try {
+                const value = await AsyncStorage.getItem('userName');
+                if (value !== null) {
+                    setUserName(value);
+                    name = value;
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        };
+        getData().then(r => {
+            //get income details
+            getIncomeDetails(name);
+        });
+
+    }, [isFocused]);
+
+    //get income details
+    function getIncomeDetails(name) {
+        fetch('https://coin-boot.herokuapp.com/api/user/income?user_name=' + name + '&month=' + month + '&year=' + year)
+            .then(response => response.json())
+            .then(json => {
+                setIncomeDetails(json);
+            })
+            .catch((error) => {
+                let obj = {
+                    salary: 0 ,
+                    interest: 0,
+                    other: 0
+                };
+                setIncomeDetails(obj);
+            });
+    }
 
     //re render component every time when navigate to it
     useEffect(() => {
@@ -33,6 +87,7 @@ const IncomeScreen = () => {
             value: '',
             isTyped: false,
         });
+        selected_category = 'salary';
     }, [isFocused]);
 
     const onSalaryClick = () => {
@@ -53,6 +108,75 @@ const IncomeScreen = () => {
         setOtherClicked(true);
     };
 
+    const onSaveClick = () => {
+        //check if one of category is selected
+        if (isSalaryClicked || isInterestClicked || isOtherClicked) {
+            //check if input field is not empty
+            if (income.value.length > 0 && income.value.length !== 'undefined') {
+                if (isSalaryClicked) {
+                    selected_category = 'salary';
+                } else if (isInterestClicked) {
+                    selected_category = 'interest';
+                } else if (isOtherClicked) {
+                    selected_category = 'other';
+                }
+
+                //get details
+                let obj = {
+                    user_name: userName,
+                    year: year,
+                    month: month,
+                    details: [
+                        {
+                            user: [
+                                {
+                                    user_name: userName,
+                                    details: [
+                                        {
+                                            year: year,
+                                            month: month,
+                                            salary: isSalaryClicked ? parseInt(income.value) : 0,
+                                            interest: isInterestClicked ? parseInt(income.value) : 0,
+                                            other: isOtherClicked ? parseInt(income.value) : 0,
+                                        },
+                                    ],
+                                },
+                            ],
+                        },
+                    ],
+                };
+
+                //save income details
+                fetch('https://coin-boot.herokuapp.com/api/user/income/', {
+                    method: 'POST',
+                    headers: {
+                        Accept: 'application/json',
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(obj),
+                }).then((response) => {
+                        alert('Data saved!');
+                        getIncomeDetails(userName);
+                        setSalaryClicked(false);
+                        setInterestClicked(false);
+                        setOtherClicked(false);
+                        setIncome({
+                            ...income,
+                            value: '',
+                            isTyped: false,
+                        });
+                        selected_category = 'salary';
+                    })
+                    .catch((error) => console.log(error));
+
+            } else {
+                alert('Income value is empty');
+            }
+        } else {
+            alert('Select a category');
+        }
+    };
+
     const incomeOnTyping = (text) => {
         setIncome({
             ...income,
@@ -61,10 +185,17 @@ const IncomeScreen = () => {
         });
     };
 
+    const onSalaryViewClick = () => {
+        alert('hello');
+    }
+
+
+
     // each value represents a goal ring in Progress chart
+    let totalIncome = incomeDetails.salary + incomeDetails.interest + incomeDetails.other
     const data = {
         labels: ['Other', 'Interest', 'Salary'], // optional
-        data: [0.4, 0.6, 0.8],
+        data: [(incomeDetails.other / totalIncome), (incomeDetails.interest/ totalIncome), (incomeDetails.salary / totalIncome)],
         colors: ['#BB4440', '#D4B630', '#63A15F'],
     };
 
@@ -102,7 +233,8 @@ const IncomeScreen = () => {
                             <TouchableOpacity onPress={onSalaryClick}>
                                 <View
                                     style={[style.salaryContainer, {backgroundColor: isSalaryClicked ? '#ffffff' : '#63A15F'}]}>
-                                    <FontAwesome name='money' size={35} color={isSalaryClicked ? '#27231F' : '#ffffff'}/>
+                                    <FontAwesome name='money' size={35}
+                                                 color={isSalaryClicked ? '#27231F' : '#ffffff'}/>
                                     <Text
                                         style={[style.salaryTitle, {color: isSalaryClicked ? '#27231F' : '#ffffff'}]}>Salary</Text>
                                 </View>
@@ -119,14 +251,15 @@ const IncomeScreen = () => {
                             <TouchableOpacity onPress={onOtherClick}>
                                 <View
                                     style={[style.otherContainer, {backgroundColor: isOtherClicked ? '#ffffff' : '#BB4440'}]}>
-                                    <AntDesign name='question' size={35} color={isOtherClicked ? '#27231F' : '#ffffff'}/>
+                                    <AntDesign name='question' size={35}
+                                               color={isOtherClicked ? '#27231F' : '#ffffff'}/>
                                     <Text
                                         style={[style.otherTitle, {color: isOtherClicked ? '#27231F' : '#ffffff'}]}>Other</Text>
                                 </View>
                             </TouchableOpacity>
                         </Animatable.View>
                         <Animatable.View style={style.saveButtonContainer} animation='fadeIn' duration={1500}>
-                            <TouchableOpacity style={style.saveButton}>
+                            <TouchableOpacity style={style.saveButton} onPress={() => onSaveClick()}>
                                 <AntDesign name='plus' color='white' size={20}/>
                             </TouchableOpacity>
                         </Animatable.View>
@@ -146,7 +279,7 @@ const IncomeScreen = () => {
                         </Animatable.View>
                         <View style={{flex: 0.1, borderBottomColor: '#B1B1B1', borderBottomWidth: 1}}/>
                         <Animatable.View animation='pulse' duration={1500} style={style.monthlyIncomeDetailViewContainer}>
-                            <TouchableOpacity style={style.salaryDetailView}>
+                            <TouchableOpacity style={style.salaryDetailView}  >
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -155,7 +288,7 @@ const IncomeScreen = () => {
                                     borderBottomLeftRadius: 15,
                                 }}/>
                                 <Text style={{fontSize: 18, fontWeight: 'bold'}}>Salary</Text>
-                                <Text style={{color: 'grey'}}>100000.00</Text>
+                                <Text style={{color: 'grey'}}>{incomeDetails.salary}.00</Text>
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -164,7 +297,7 @@ const IncomeScreen = () => {
                                     borderBottomRightRadius: 15,
                                 }}/>
                             </TouchableOpacity>
-                            <TouchableOpacity style={style.interestDetailView}>
+                            <TouchableOpacity style={style.interestDetailView} >
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -172,8 +305,8 @@ const IncomeScreen = () => {
                                     borderTopLeftRadius: 15,
                                     borderBottomLeftRadius: 15,
                                 }}/>
-                                <Text style={{fontSize: 18, fontWeight: 'bold'}}>Income</Text>
-                                <Text style={{color: 'grey'}}>100000.00</Text>
+                                <Text style={{fontSize: 18, fontWeight: 'bold'}}>Interest</Text>
+                                <Text style={{color: 'grey'}}>{incomeDetails.interest}.00</Text>
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -182,7 +315,7 @@ const IncomeScreen = () => {
                                     borderBottomRightRadius: 15,
                                 }}/>
                             </TouchableOpacity>
-                            <TouchableOpacity style={style.otherDetailView}>
+                            <TouchableOpacity style={style.otherDetailView} >
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -191,7 +324,7 @@ const IncomeScreen = () => {
                                     borderBottomLeftRadius: 15,
                                 }}/>
                                 <Text style={{fontSize: 18, fontWeight: 'bold'}}>Other</Text>
-                                <Text style={{color: 'grey'}}>100000.00</Text>
+                                <Text style={{color: 'grey'}}>{incomeDetails.other}.00</Text>
                                 <View style={{
                                     height: '100%',
                                     width: 40,
@@ -228,10 +361,9 @@ const style = StyleSheet.create({
     incomeTitle: {
         fontSize: 30,
         color: '#ffffff',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
-    footerContainer: {
-    },
+    footerContainer: {},
     incomeTextFieldContainer: {
         flex: 1,
     },
@@ -239,18 +371,17 @@ const style = StyleSheet.create({
         width: width * 0.8,
         top: 5,
         alignSelf: 'center',
-        backgroundColor: '#E3E7F1'
+        backgroundColor: '#E3E7F1',
     },
     categoryContainer: {
         marginTop: 15,
     },
-    categoryTitleContainer: {
-    },
+    categoryTitleContainer: {},
     categoryTitle: {
         color: 'grey',
         alignSelf: 'center',
         fontSize: 18,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     },
     detailsContainer: {
         flex: 1,
@@ -306,13 +437,14 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         elevation: 10,
-        backgroundColor: '#647C90'
+        backgroundColor: '#647C90',
     },
     progressChartContainer: {
-        height: 150
+        height: 150,
     },
     monthlyIncomeDetailViewContainer: {
         width: width,
+        height: 210,
         flexDirection: 'column',
         justifyContent: 'space-evenly',
         alignItems: 'center',
@@ -326,7 +458,7 @@ const style = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#EDF2F3',
-        marginTop: 25
+        marginTop: 25,
     },
     interestDetailView: {
         width: '70%',
@@ -337,7 +469,7 @@ const style = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#EDF2F3',
-        marginTop: 25
+        marginTop: 25,
     },
     otherDetailView: {
         width: '80%',
@@ -348,7 +480,7 @@ const style = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#EDF2F3',
-        marginTop: 25
+        marginTop: 25,
     },
 });
 

@@ -9,10 +9,15 @@ import IncomeStackScreen from './main-tabs/IncomeStackScreen';
 import ExpenseStackScreen from './main-tabs/ExpenseStackScreen';
 import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
+import LogOutScreen from './main-tabs/LogOutScreen';
+import {AuthContext} from '../components/context';
 
 const Tab = createBottomTabNavigator();
 
 const MainTabScreen = () => {
+
+    const {signOut} = React.useContext(AuthContext);
+
     return (
         <Tab.Navigator
             initialRouteName="Home"
@@ -34,7 +39,6 @@ const MainTabScreen = () => {
                             <AntDesign name="home" style={{color: focused ? '#fff' : 'gray'}} size={26}/>
                         </View>
                     },
-                    unmountOnBlur: true,
                 }}
             />
             <Tab.Screen
@@ -47,7 +51,6 @@ const MainTabScreen = () => {
                             <MaterialIcons name="attach-money" style={{color: focused ? '#fff' : 'gray'}} size={26}/>
                         </View>
                     },
-                    unmountOnBlur: true,
                 }}
             />
             <Tab.Screen
@@ -60,7 +63,22 @@ const MainTabScreen = () => {
                             <Entypo name="drop" style={{color: focused ? '#fff' : 'gray'}} size={26}/>
                         </View>
                     },
-                    unmountOnBlur: true,
+                }}
+            />
+            <Tab.Screen
+                name="LogOut"
+                component={LogOutScreen}
+                options={{
+                    tabBarLabel: ' LogOut',
+                    tabBarIcon: ({focused}) => {
+                        return (
+                            <TouchableOpacity onPress={() => signOut()}>
+                                <View style={[style.bottomIcon, {backgroundColor: focused ? '#384c96' : '#fff'} ]} >
+                                    <AntDesign name="logout" style={{color: focused ? '#fff' : 'gray'}} size={26}/>
+                                </View>
+                            </TouchableOpacity>
+                        )
+                    },
                 }}
             />
         </Tab.Navigator>

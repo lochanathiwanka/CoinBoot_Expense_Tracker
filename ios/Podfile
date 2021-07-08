@@ -16,6 +16,8 @@ target 'CoinBoot' do
 
   pod 'BVLinearGradient', :path => '../node_modules/react-native-linear-gradient'
 
+  pod 'RNCAsyncStorage', :path => '../node_modules/@react-native-async-storage/async-storage'
+
   target 'CoinBootTests' do
     inherit! :complete
     # Pods for testing

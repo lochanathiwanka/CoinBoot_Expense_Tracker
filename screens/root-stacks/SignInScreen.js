@@ -7,10 +7,15 @@ import LinearGradient from 'react-native-linear-gradient';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Animatable from 'react-native-animatable'
 import Feather from 'react-native-vector-icons/Feather';
+import {AuthContext} from '../../components/context';
 
 const SignInScreen = ({navigation}) => {
 
+    const {signIn} = React.useContext(AuthContext);
+
     const [data, setData] = React.useState({
+        userName: '',
+        password: '',
         showPassword: false
     });
 
@@ -18,6 +23,20 @@ const SignInScreen = ({navigation}) => {
         setData({
             ...data,
            showPassword: !data.showPassword
+        });
+    }
+
+    const userNameOnChange = (value) => {
+        setData({
+           ...data,
+           userName: value
+        });
+    }
+
+    const passwordOnChange = (value) => {
+        setData({
+            ...data,
+            password: value
         });
     }
 
@@ -36,35 +55,14 @@ const SignInScreen = ({navigation}) => {
             <Animatable.View style={style.formContainer} animation='fadeInUpBig'>
                 <View style={style.userNameContainer}>
                     <Text style={style.formLabel}>User Name</Text>
-                    <FontAwesome
-                        name='user-o'
-                        color="black"
-                        size={20}
-                        style={style.formIcon}
-                    />
-                    <TextInput
-                        placeholder='user123@gmail.com'
-                        style={style.formInput}
-                    />
+                    <FontAwesome name='user-o' color="black" size={20} style={style.formIcon}/>
+                    <TextInput placeholder='user123@gmail.com' style={style.formInput} onChangeText={(val) => userNameOnChange(val)}/>
                 </View>
                 <View style={style.passwordContainer}>
                     <Text style={style.formLabel}>Password</Text>
-                    <FontAwesome
-                        name='lock'
-                        color="black"
-                        size={20}
-                        style={style.formIcon}
-                    />
-                    <TextInput
-                        placeholder='********'
-                        style={style.formInput}
-                        autoCapitalize='none'
-                        secureTextEntry={!data.showPassword}
-                    />
-                    <TouchableOpacity
-                        style={{position:'absolute', top:'50%', right: 30}}
-                        onPress={showPassword}
-                    >
+                    <FontAwesome name='lock' color="black" size={20} style={style.formIcon}/>
+                    <TextInput placeholder='********' style={style.formInput} autoCapitalize='none' secureTextEntry={!data.showPassword} onChangeText={(val) => passwordOnChange(val)}/>
+                    <TouchableOpacity style={{position:'absolute', top:'50%', right: 30}} onPress={showPassword}>
                         {data.showPassword?
                             <Feather
                                 name='eye'
@@ -79,7 +77,7 @@ const SignInScreen = ({navigation}) => {
                         }
                     </TouchableOpacity>
                 </View>
-                <TouchableOpacity style={style.loginButtonContainer}>
+                <TouchableOpacity style={style.loginButtonContainer} onPress={() => signIn(data.userName, data.password)}>
                     <LinearGradient colors={['#384c96', '#384c96']} style={style.loginButton}>
                         <Text style={style.loginText}>Login</Text>
                     </LinearGradient>
