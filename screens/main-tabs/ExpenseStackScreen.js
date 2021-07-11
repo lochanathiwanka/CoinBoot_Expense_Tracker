@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Platform} from 'react-native';
+import {Text, View, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Platform, RefreshControl} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {TextInput} from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -17,6 +17,10 @@ import {PieChart} from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Device from 'react-native-paper/src/components/TextInput/TextInputFlat';
 
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 const ExpenseScreen = () => {
 
     let today = new Date();
@@ -25,6 +29,8 @@ const ExpenseScreen = () => {
     ];
     let month = monthNames[today.getMonth()];
     let year = today.getFullYear().toString();
+
+    const [refreshing, setRefreshing] = React.useState(false);
 
     const [expense, setExpense] = React.useState({
         value: '',
@@ -90,6 +96,11 @@ const ExpenseScreen = () => {
         });
     }
 
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        wait(2000).then(() => setRefreshing(false));
+    }, []);
+
     useEffect(() => {
         let name = '';
         //get userName from Async Storage
@@ -109,7 +120,7 @@ const ExpenseScreen = () => {
             getExpenseDetails(name);
         });
 
-    }, [isFocused]);
+    }, [refreshing]);
 
     //get expense details
     function getExpenseDetails(name) {
@@ -163,7 +174,7 @@ const ExpenseScreen = () => {
 
     const onEducationClick = () => {
         changeStatus([false,false, false, true, false, false, false, false, false]);
-        resetExpenseDetailViews();
+        resetExpenseDetailViews([false,false, false, false, false, false, false, false, false]);
     }
 
     const onElectricityClick = () => {
@@ -520,7 +531,7 @@ const ExpenseScreen = () => {
             <View style={style.headerContainer}>
                 <Text style={style.expenseTitle}>Expense</Text>
             </View>
-            <ScrollView>
+            <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                 <View style={style.footerContainer}>
                     <View style={style.expenseTextFieldContainer}>
                         <TextInput

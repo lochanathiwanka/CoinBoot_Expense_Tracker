@@ -114,7 +114,13 @@ const SignUpScreen = ({navigation}) => {
                     <View style={style.passwordContainer}>
                         <Text style={style.formLabel}>Password</Text>
                         <FontAwesome name='lock' color="black" size={20} style={style.formIcon}/>
-                        <TextInput placeholder='********' style={style.formInput} autoCapitalize='none' secureTextEntry={!data.showPassword} onChangeText={(val) => passwordOnChange(val)}/>
+                        <TextInput
+                            placeholder='********'
+                            style={style.formInput}
+                            autoCapitalize='none'
+                            secureTextEntry={!data.showPassword}
+                            onChangeText={(val) => passwordOnChange(val)}
+                        />
                         <TouchableOpacity style={{position:'absolute', top:'50%', right: 30}} onPress={showPassword}>
                             {data.showPassword?
                                 <Feather name='eye' color='gray' size={18}/> :

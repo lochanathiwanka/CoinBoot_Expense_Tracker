@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Text, View, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Platform} from 'react-native';
+import {Text, View, StyleSheet, Dimensions, TouchableOpacity, ScrollView, Platform, RefreshControl} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import {TextInput} from 'react-native-paper';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
@@ -12,6 +12,10 @@ import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Device from 'react-native-paper/src/components/TextInput/TextInputFlat';
 
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 const IncomeScreen = () => {
 
     let today = new Date();
@@ -20,6 +24,8 @@ const IncomeScreen = () => {
     ];
     let month = monthNames[today.getMonth()];
     let year = today.getFullYear().toString();
+
+    const [refreshing, setRefreshing] = React.useState(false);
 
     //income text field
     const [income, setIncome] = React.useState({
@@ -46,6 +52,11 @@ const IncomeScreen = () => {
 
     const [userName, setUserName] = React.useState('');
 
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        wait(2000).then(() => setRefreshing(false));
+    }, []);
+
     useEffect(() => {
         let name = '';
         //get userName from Async Storage
@@ -65,7 +76,7 @@ const IncomeScreen = () => {
             getIncomeDetails(name);
         });
 
-    }, [isFocused]);
+    }, [refreshing]);
 
     //get income details
     function getIncomeDetails(name) {
@@ -348,7 +359,7 @@ const IncomeScreen = () => {
             <View style={style.headerContainer}>
                 <Text style={style.incomeTitle}>Income</Text>
             </View>
-            <ScrollView>
+            <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
                 <View style={style.footerContainer}>
                     <View style={style.incomeTextFieldContainer}>
                         <TextInput onChangeText={text => incomeOnTyping(text)} value={income.value} label='Income'

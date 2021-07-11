@@ -1,5 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {StatusBar, Text, View, StyleSheet, Dimensions, Image, TouchableOpacity} from 'react-native';
+import {
+    StatusBar,
+    Text,
+    View,
+    StyleSheet,
+    Dimensions,
+    Image,
+    TouchableOpacity,
+    ScrollView,
+    RefreshControl,
+} from 'react-native';
 import {createStackNavigator} from '@react-navigation/stack';
 import AntDesign from 'react-native-vector-icons/AntDesign';
 import {PieChart} from 'react-native-chart-kit';
@@ -10,6 +20,10 @@ import {AuthContext} from '../../components/context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {log} from 'react-native-reanimated';
 
+const wait = (timeout) => {
+    return new Promise(resolve => setTimeout(resolve, timeout));
+}
+
 const HomeScreen = () => {
 
     let today = new Date();
@@ -19,13 +33,19 @@ const HomeScreen = () => {
     let month = monthNames[today.getMonth()];
     let year = today.getFullYear();
 
+    const [refreshing, setRefreshing] = React.useState(false);
+
     const [user, setUser] = React.useState({});
 
     const [income, setIncome] = React.useState({});
     const [expense, setExpense] = React.useState({});
-    const [revenue, setRevenue] = React.useState({});
 
     const isFocused = useIsFocused();
+
+    const onRefresh = React.useCallback(() => {
+        setRefreshing(true);
+        wait(2000).then(() => setRefreshing(false));
+    }, []);
 
     //re render component every time when navigate to it
     useEffect(() => {
@@ -83,14 +103,7 @@ const HomeScreen = () => {
                 .catch((error) => console.log('User Not Found!'));
         });
 
-    }, [isFocused]);
-    //set revenue
-    useEffect(async () => {
-        setRevenue({
-            value: income.value - expense.value
-        });
-    }, [isFocused]);
-
+    }, [refreshing]);
 
     //pie chart data
     const data = [
@@ -131,53 +144,55 @@ const HomeScreen = () => {
     };
 
     return (
-        <View style={style.container}>
-            <FocusAwareStatusBar backgroundColor='#E3E7F1' barStyle="dark-content"/>
-            <Animatable.View style={style.headerContainer} animation='bounceIn' duration={1500}>
-                <Image style={style.userImage} source={require('../../assets/user_1.png')}/>
-                <Text style={style.fullName}>{user.name}</Text>
-                <Text style={style.userName}>@{user.user_name}</Text>
-                <View style={style.monthlyOverviewContainer}>
-                    <View style={style.monthContainer}>
-                        <TouchableOpacity>
-                            <AntDesign name='left' color='white' size={20}/>
-                        </TouchableOpacity>
-                        <Text style={style.monthName}>{month}</Text>
-                        <TouchableOpacity>
-                            <AntDesign name='right' color='white' size={20}/>
-                        </TouchableOpacity>
+        <ScrollView style={{backgroundColor: '#E3E7F1'}} refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
+            <View style={style.container}>
+                <FocusAwareStatusBar backgroundColor='#E3E7F1' barStyle="dark-content"/>
+                <Animatable.View style={style.headerContainer} animation='bounceIn' duration={1500}>
+                    <Image style={style.userImage} source={require('../../assets/user_1.png')}/>
+                    <Text style={style.fullName}>{user.name}</Text>
+                    <Text style={style.userName}>@{user.user_name}</Text>
+                    <View style={style.monthlyOverviewContainer}>
+                        <View style={style.monthContainer}>
+                            <TouchableOpacity>
+                                <AntDesign name='left' color='white' size={20}/>
+                            </TouchableOpacity>
+                            <Text style={style.monthName}>{month}</Text>
+                            <TouchableOpacity>
+                                <AntDesign name='right' color='white' size={20}/>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={style.detailsContainer}>
+                            <View style={style.monthlyIncomeContainer}>
+                                <Text style={style.incomeValue}>{income.value ? income.value : 0}</Text>
+                                <Text style={style.incomeTitle}>Income</Text>
+                            </View>
+                            <View style={style.monthlyRevenueContainer}>
+                                <Text style={style.revenueValue}>{income.value - expense.value ? income.value - expense.value : 0}</Text>
+                                <Text style={style.revenueTitle}>Revenue</Text>
+                            </View>
+                            <View style={style.monthlyExpenseContainer}>
+                                <Text style={style.expenseValue}>{expense.value ? expense.value : 0}</Text>
+                                <Text style={style.expenseTitle}>Expense</Text>
+                            </View>
+                        </View>
                     </View>
-                    <View style={style.detailsContainer}>
-                        <View style={style.monthlyIncomeContainer}>
-                            <Text style={style.incomeValue}>{income.value ? income.value : 0}</Text>
-                            <Text style={style.incomeTitle}>Income</Text>
-                        </View>
-                        <View style={style.monthlyRevenueContainer}>
-                            <Text style={style.revenueValue}>{income.value - expense.value ? income.value - expense.value : 0}</Text>
-                            <Text style={style.revenueTitle}>Revenue</Text>
-                        </View>
-                        <View style={style.monthlyExpenseContainer}>
-                            <Text style={style.expenseValue}>{expense.value ? expense.value : 0}</Text>
-                            <Text style={style.expenseTitle}>Expense</Text>
-                        </View>
-                    </View>
-                </View>
-            </Animatable.View>
-            <Animatable.View style={style.footerContainer} animation='fadeInUpBig'>
-                <Text style={{fontSize: 30, fontWeight: 'bold', color: '#414754', left: 20, top: 20}}>Overview</Text>
-                <PieChart
-                    data={data}
-                    width={screenWidth}
-                    height={220}
-                    chartConfig={chartConfig}
-                    accessor={'value'}
-                    backgroundColor={'transparent'}
-                    paddingLeft={'15'}
-                    absolute
-                    style={{top: 50}}
-                />
-            </Animatable.View>
-        </View>
+                </Animatable.View>
+                <Animatable.View style={style.footerContainer} animation='fadeInUpBig'>
+                    <Text style={{fontSize: 30, fontWeight: 'bold', color: '#414754', left: 20, top: 50}}>Overview</Text>
+                    <PieChart
+                        data={data}
+                        width={screenWidth}
+                        height={220}
+                        chartConfig={chartConfig}
+                        accessor={'value'}
+                        backgroundColor={'transparent'}
+                        paddingLeft={'15'}
+                        absolute
+                        style={{top: 90}}
+                    />
+                </Animatable.View>
+            </View>
+        </ScrollView>
     );
 };
 
@@ -185,7 +200,8 @@ const {width, height} = Dimensions.get('screen');
 
 const style = StyleSheet.create({
     container: {
-        flex: 1,
+        /*flex: 1,*/
+        height: 760,
         flexDirection: 'column',
         backgroundColor: '#E3E7F1',
         justifyContent: 'space-evenly',
@@ -195,7 +211,7 @@ const style = StyleSheet.create({
         backgroundColor: '#ffffff',
         width: 350,
         height: 350,
-        marginTop: 10,
+        marginTop: 30,
         borderRadius: 30,
         /*elevation: 5,
         shadowColor: '#4949a3',
