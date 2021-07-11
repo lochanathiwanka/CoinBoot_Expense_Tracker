@@ -17,6 +17,7 @@ import * as Animatable from 'react-native-animatable'
 import Feather from 'react-native-vector-icons/Feather';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import {AuthContext} from '../../components/context';
+import Device from 'react-native-paper/src/components/TextInput/TextInputFlat';
 
 const SignUpScreen = ({navigation}) => {
 
@@ -103,7 +104,7 @@ const SignUpScreen = ({navigation}) => {
                     <View style={style.contactContainer}>
                         <Text style={style.formLabel}>Contact</Text>
                         <AntDesign name='leftcircleo' color="black" size={20} style={style.formIcon}/>
-                        <TextInput placeholder='+94111111111' style={style.formInput} onChangeText={(val) => contactOnChange(val)}/>
+                        <TextInput placeholder='+94111111111' style={style.formInput} onChangeText={(val) => contactOnChange(val)} keyboardType={Device.isAndroid ? "numeric" : "number-pad"}/>
                     </View>
                     <View style={style.userNameContainer}>
                         <Text style={style.formLabel}>User Name</Text>

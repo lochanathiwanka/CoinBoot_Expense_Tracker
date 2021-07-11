@@ -10,6 +10,7 @@ import ProgressChart from 'react-native-chart-kit/dist/ProgressChart';
 import FocusAwareStatusBar from '../FocusAwareStatusBar';
 import * as Animatable from 'react-native-animatable';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Device from 'react-native-paper/src/components/TextInput/TextInputFlat';
 
 const IncomeScreen = () => {
 
@@ -352,7 +353,9 @@ const IncomeScreen = () => {
                     <View style={style.incomeTextFieldContainer}>
                         <TextInput onChangeText={text => incomeOnTyping(text)} value={income.value} label='Income'
                                    theme={{colors: {primary: '#384c96'}}} style={style.incomeTextField}
-                                   placeholder="Type input"/>
+                                   placeholder="Type input"
+                                   keyboardType={Device.isAndroid ? "numeric" : "number-pad"}
+                        />
                     </View>
                     <View style={style.categoryContainer}>
                         <View style={style.categoryTitleContainer}>
@@ -484,7 +487,7 @@ const style = StyleSheet.create({
         backgroundColor: '#44403F',
         borderBottomLeftRadius: 60,
         borderBottomRightRadius: 60,
-        elevation: 10,
+        /*elevation: 10,*/
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -527,7 +530,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     salaryTitle: {
         fontSize: 12,
@@ -538,7 +541,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     interestTitle: {
         fontSize: 12,
@@ -549,7 +552,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     otherTitle: {
         fontSize: 12,
@@ -558,7 +561,6 @@ const style = StyleSheet.create({
         height: 55,
         justifyContent: 'flex-end',
         alignItems: 'center',
-
     },
     saveButton: {
         width: 30,
@@ -566,7 +568,7 @@ const style = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 10,
+        /*elevation: 10,*/
         backgroundColor: '#647C90',
     },
     progressChartContainer: {
@@ -583,7 +585,7 @@ const style = StyleSheet.create({
         width: '60%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -594,7 +596,7 @@ const style = StyleSheet.create({
         width: '70%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -605,7 +607,7 @@ const style = StyleSheet.create({
         width: '80%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',

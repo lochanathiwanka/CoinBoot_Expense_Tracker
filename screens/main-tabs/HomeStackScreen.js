@@ -110,7 +110,7 @@ const HomeScreen = () => {
         },
         {
             name: 'Revenue',
-            value: revenue.value ? revenue.value : 0,
+            value: income.value - expense.value ? income.value - expense.value : 0,
             color: '#CBCDCB',
             legendFontColor: '#7F7F7F',
             legendFontSize: 15,
@@ -153,7 +153,7 @@ const HomeScreen = () => {
                             <Text style={style.incomeTitle}>Income</Text>
                         </View>
                         <View style={style.monthlyRevenueContainer}>
-                            <Text style={style.revenueValue}>{revenue.value ? revenue.value : 0}</Text>
+                            <Text style={style.revenueValue}>{income.value - expense.value ? income.value - expense.value : 0}</Text>
                             <Text style={style.revenueTitle}>Revenue</Text>
                         </View>
                         <View style={style.monthlyExpenseContainer}>
@@ -197,14 +197,14 @@ const style = StyleSheet.create({
         height: 350,
         marginTop: 10,
         borderRadius: 30,
-        elevation: 5,
+        /*elevation: 5,
         shadowColor: '#4949a3',
         shadowOffset: {
             width: 0,
             height: 10,
         },
         shadowOpacity: 0.25,
-        shadowRadius: 3.5,
+        shadowRadius: 3.5,*/
     },
     userImage: {
         alignSelf: 'center',

@@ -15,6 +15,7 @@ import FocusAwareStatusBar from '../FocusAwareStatusBar';
 import * as Animatable from 'react-native-animatable';
 import {PieChart} from 'react-native-chart-kit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Device from 'react-native-paper/src/components/TextInput/TextInputFlat';
 
 const ExpenseScreen = () => {
 
@@ -522,7 +523,14 @@ const ExpenseScreen = () => {
             <ScrollView>
                 <View style={style.footerContainer}>
                     <View style={style.expenseTextFieldContainer}>
-                        <TextInput onChangeText={text => expenseOnTyping(text)} value={expense.value} label='Expense' theme={{ colors: {primary: '#384c96'} }} style={style.expenseTextField} placeholder="Type input"/>
+                        <TextInput
+                            onChangeText={text => expenseOnTyping(text)}
+                            value={expense.value} label='Expense'
+                            theme={{ colors: {primary: '#384c96'} }}
+                            style={style.expenseTextField}
+                            placeholder="Type input"
+                            keyboardType={Device.isAndroid ? "numeric" : "number-pad"}
+                        />
                     </View>
                     <View style={style.categoryContainer}>
                         <View style={style.categoryTitleContainer}>
@@ -684,7 +692,7 @@ const style = StyleSheet.create({
         backgroundColor: '#63A15F',
         borderBottomLeftRadius: 60,
         borderBottomRightRadius: 60,
-        elevation: 10,
+        /*elevation: 10,*/
         justifyContent: 'center',
         alignItems: 'center',
     },
@@ -729,7 +737,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     foodTitle: {
         fontSize: 12,
@@ -740,7 +748,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     transportTitle: {
         fontSize: 12,
@@ -751,7 +759,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     healthTitle: {
         fontSize: 12,
@@ -762,7 +770,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     educationTitle: {
         fontSize: 12,
@@ -773,7 +781,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     electricityTitle: {
         fontSize: 12,
@@ -784,7 +792,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     waterTitle: {
         fontSize: 12,
@@ -795,7 +803,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     telephoneTitle: {
         fontSize: 12,
@@ -806,7 +814,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     homeTitle: {
         fontSize: 12,
@@ -817,7 +825,7 @@ const style = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
     },
     otherTitle: {
         fontSize: 12,
@@ -834,7 +842,7 @@ const style = StyleSheet.create({
         borderRadius: 20,
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 10,
+        /*elevation: 10,*/
         backgroundColor: '#647C90'
     },
     pieChartContainer: {
@@ -850,7 +858,7 @@ const style = StyleSheet.create({
         width: '60%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -861,7 +869,7 @@ const style = StyleSheet.create({
         width: '65%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -872,7 +880,7 @@ const style = StyleSheet.create({
         width: '70%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -883,7 +891,7 @@ const style = StyleSheet.create({
         width: '80%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -894,7 +902,7 @@ const style = StyleSheet.create({
         width: '90%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -905,7 +913,7 @@ const style = StyleSheet.create({
         width: '80%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -916,7 +924,7 @@ const style = StyleSheet.create({
         width: '70%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -927,7 +935,7 @@ const style = StyleSheet.create({
         width: '65%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
@@ -938,7 +946,7 @@ const style = StyleSheet.create({
         width: '60%',
         height: 40,
         borderRadius: 15,
-        elevation: 10,
+        /*elevation: 10,*/
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',

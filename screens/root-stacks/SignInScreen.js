@@ -48,7 +48,7 @@ const SignInScreen = ({navigation}) => {
                         name='suse'
                         color="black"
                         size={80}
-                        style={{color: '#fff'}}
+                        style={{color: '#fff',  aspectRatio: 1.2}}
                     />
                 </View>
             </View>
