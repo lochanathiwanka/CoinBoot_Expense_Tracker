@@ -42,6 +42,12 @@ const App = () => {
                     userName: action.id,
                     isLoading: false
                 }
+            case 'OPTION':
+                return {
+                    ...prevState,
+                    userName: null,
+                    isLoading: false
+                }
         }
     }
 
@@ -57,7 +63,18 @@ const App = () => {
                         name = json.user_name
                         dispatch({type: 'LOGIN', id: name});
                     })
-                    .catch((error) => alert('User Not Found!'));
+                    .catch((error) => {
+                        alert('User Not Found!');
+                        dispatch({type: 'OPTION'});
+                        const removeValue = async () => {
+                            try {
+                                await AsyncStorage.removeItem('userName');
+                            } catch(e) {
+                                console.log(e);
+                            }
+                        }
+                        removeValue();
+                    });
 
                 try {
                     await AsyncStorage.setItem('userName', userName);
